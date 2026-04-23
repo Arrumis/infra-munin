@@ -39,6 +39,7 @@ docker network create proxy-network
 - `MUNIN_NODE_ADDRESS` などの環境変数を設定へ反映
 
 Docker 上の Munin からホストの `munin-node` を参照する場合、既定では `host.docker.internal` を使います。Linux でも動くように `compose.yaml` で `host-gateway` を追加しています。
+Web UI は reverse proxy から `127.0.0.1:<MUNIN_HTTP_PORT>` で受ける想定なので、Apache 側でも loopback を許可しています。
 
 ## 補足
 

@@ -23,7 +23,7 @@ render_template() {
     cp "${src}" "${dest}"
     sed -i "s|\${MUNIN_NODE_NAME}|${MUNIN_NODE_NAME:-docker-host}|g" "${dest}"
     sed -i "s|\${MUNIN_NODE_ADDRESS}|${MUNIN_NODE_ADDRESS:-host.docker.internal}|g" "${dest}"
-    sed -i "s|\${MUNIN_ALLOWED_CIDR}|${MUNIN_ALLOWED_CIDR:-172.20.0.0/16}|g" "${dest}"
+    sed -i "s|\${MUNIN_ALLOWED_CIDR}|${MUNIN_ALLOWED_CIDR:-172.16.0.0/12}|g" "${dest}"
     sed -i "s|\${EXCLUDE_CONTAINER_NAME}|${EXCLUDE_CONTAINER_NAME:-runner}|g" "${dest}"
   fi
 }
