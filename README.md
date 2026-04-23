@@ -40,5 +40,4 @@ docker network create proxy-network
 
 - `apache2_munin.conf` は内部ネットワークからのアクセスだけ許可します
 - 認証は proxy 側で行う前提なので、Munin コンテナ内部の basic 認証は有効化していません
-- ホストに `munin-node` を入れる場合は [scripts/setup-host-munin-node.sh](/home/hiyori2023/infra-munin/scripts/setup-host-munin-node.sh:1) を土台にできます
-
+- ホストに `munin-node` を入れる場合は `scripts/setup-host-munin-node.sh` を土台にできます
