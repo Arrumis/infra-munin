@@ -1,0 +1,8 @@
+.env.local
+.env
+data/config/*
+data/config/plugin-conf.d/*
+!data/.gitkeep
+!data/config/.gitkeep
+!data/config/plugin-conf.d/.gitkeep
+!scripts/*.sh

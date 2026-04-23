@@ -1,0 +1,5 @@
+[docker_*]
+user root
+group docker
+env.DOCKER_HOST unix:///var/run/docker.sock
+env.EXCLUDE_CONTAINER_NAME ${EXCLUDE_CONTAINER_NAME}

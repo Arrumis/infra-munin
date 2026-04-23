@@ -1,0 +1,25 @@
+services:
+  munin:
+    build:
+      context: .
+    restart: always
+    ports:
+      - "${MUNIN_HTTP_PORT:-8080}:80"
+    volumes:
+      - ./data/config/munin.conf:/etc/munin/munin.conf:ro
+      - ./data/config/apache2_munin.conf:/etc/apache2/conf-enabled/munin.conf:ro
+      - ./data/config/ports.conf:/etc/apache2/ports.conf:ro
+      - ./data/config/apache2_apache2.conf:/etc/apache2/apache2.conf:ro
+      - ./data/config/plugin-conf.d/docker:/etc/munin/plugin-conf.d/docker:ro
+      - ./scripts/setup-docker-plugins.sh:/setup_docker_plugins.sh:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      TZ: "${TZ:-Asia/Tokyo}"
+    networks:
+      proxy:
+
+networks:
+  proxy:
+    external: true
+    name: "${PROXY_NETWORK_NAME:-proxy-network}"
+
