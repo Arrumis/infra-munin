@@ -3,6 +3,8 @@ services:
     build:
       context: .
     restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "${MUNIN_HTTP_PORT:-8080}:80"
     volumes:
@@ -22,4 +24,3 @@ networks:
   proxy:
     external: true
     name: "${PROXY_NETWORK_NAME:-proxy-network}"
-

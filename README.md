@@ -17,6 +17,8 @@ docker compose exec munin /setup_docker_plugins.sh
 docker network create proxy-network
 ```
 
+`8080` が他サービスで使われている場合は、`.env.local` の `MUNIN_HTTP_PORT` を変えてから起動します。
+
 ## 管理対象
 
 - Munin Web UI コンテナ
@@ -36,8 +38,11 @@ docker network create proxy-network
 - `templates/config/` から実運用用設定を生成
 - `MUNIN_NODE_ADDRESS` などの環境変数を設定へ反映
 
+Docker 上の Munin からホストの `munin-node` を参照する場合、既定では `host.docker.internal` を使います。Linux でも動くように `compose.yaml` で `host-gateway` を追加しています。
+
 ## 補足
 
 - `apache2_munin.conf` は内部ネットワークからのアクセスだけ許可します
 - 認証は proxy 側で行う前提なので、Munin コンテナ内部の basic 認証は有効化していません
 - ホストに `munin-node` を入れる場合は `scripts/setup-host-munin-node.sh` を土台にできます
+- `scripts/setup-host-munin-node.sh` は、接続元の Munin サーバー IP に加えて Docker bridge 用の `cidr_allow` も入れるので、PCごとに Docker サブネットが変わっても通しやすくしています

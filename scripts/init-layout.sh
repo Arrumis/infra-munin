@@ -22,7 +22,7 @@ render_template() {
   else
     cp "${src}" "${dest}"
     sed -i "s|\${MUNIN_NODE_NAME}|${MUNIN_NODE_NAME:-docker-host}|g" "${dest}"
-    sed -i "s|\${MUNIN_NODE_ADDRESS}|${MUNIN_NODE_ADDRESS:-172.20.0.1}|g" "${dest}"
+    sed -i "s|\${MUNIN_NODE_ADDRESS}|${MUNIN_NODE_ADDRESS:-host.docker.internal}|g" "${dest}"
     sed -i "s|\${MUNIN_ALLOWED_CIDR}|${MUNIN_ALLOWED_CIDR:-172.20.0.0/16}|g" "${dest}"
     sed -i "s|\${EXCLUDE_CONTAINER_NAME}|${EXCLUDE_CONTAINER_NAME:-runner}|g" "${dest}"
   fi
@@ -35,4 +35,3 @@ cp "${ROOT_DIR}/templates/config/ports.conf" "${ROOT_DIR}/data/config/ports.conf
 render_template "${ROOT_DIR}/templates/config/plugin-conf.d/docker" "${ROOT_DIR}/data/config/plugin-conf.d/docker"
 
 echo "infra-munin layout initialized."
-

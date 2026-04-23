@@ -2,11 +2,12 @@
 set -euo pipefail
 
 if [[ $# -lt 1 ]]; then
-  echo "usage: $0 <munin_server_ip>"
+  echo "usage: $0 <munin_server_ip> [docker_cidr]"
   exit 1
 fi
 
 MUNIN_SERVER_IP="$1"
+DOCKER_CIDR="${2:-172.16.0.0/12}"
 PLUGIN_SOURCE="/usr/share/munin/plugins/docker_"
 
 sudo apt-get update
@@ -39,6 +40,11 @@ if ! grep -q "^allow \^${ESCAPED_IP}\\\\$" /etc/munin/munin-node.conf; then
   echo "allow ^${MUNIN_SERVER_IP}\$" | sudo tee -a /etc/munin/munin-node.conf >/dev/null
 fi
 
+ESCAPED_CIDR="$(printf '%s' "${DOCKER_CIDR}" | sed 's/\./\\./g; s/\//\\\\\\//g')"
+if ! grep -q "^cidr_allow ${ESCAPED_CIDR}$" /etc/munin/munin-node.conf; then
+  echo "cidr_allow ${DOCKER_CIDR}" | sudo tee -a /etc/munin/munin-node.conf >/dev/null
+fi
+
 if grep -q "^host " /etc/munin/munin-node.conf; then
   sudo sed -i 's/^host .*/host 0.0.0.0/' /etc/munin/munin-node.conf
 else
@@ -49,4 +55,3 @@ sudo systemctl enable munin-node.service
 sudo systemctl restart munin-node.service
 
 echo "munin-node setup finished."
-
