@@ -2,6 +2,10 @@
 
 Munin の監視 UI を Docker 化した独立 repo です。旧 installer の `inst/munin` と `munin.sh` を分離し、環境依存の置換処理を `init-layout.sh` に集約しています。
 
+## 日本語メモ
+
+GitHub のコミット一覧が英語で分かりにくい場合は、[コミット履歴の日本語メモ](docs/COMMIT_HISTORY_JA.md) を見てください。
+
 ## 起動
 
 ```bash
