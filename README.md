@@ -38,7 +38,9 @@ docker network create proxy-network
 - Munin Web UI コンテナ
 - Docker 監視用 `docker_` プラグイン
 
-ホスト側の `munin-node` 設定はコンテナの外にあるので、この repo では補助スクリプトだけ用意しています。
+ホスト側の `munin-node` 設定はコンテナの外にあります。
+親 repo の一括インストールでは `scripts/setup-host-munin-node.sh` を自動実行します。
+手動で再設定したい場合も、同じスクリプトを使えます。
 
 ## 初期化
 
@@ -59,5 +61,5 @@ Web UI は reverse proxy から `127.0.0.1:<MUNIN_HTTP_PORT>` で受ける想定
 
 - `apache2_munin.conf` は内部ネットワークからのアクセスだけ許可します
 - 認証は proxy 側で行う前提なので、Munin コンテナ内部の basic 認証は有効化していません
-- ホストに `munin-node` を入れる場合は `scripts/setup-host-munin-node.sh` を土台にできます
+- ホストに `munin-node` を入れる処理は `scripts/setup-host-munin-node.sh` で行います
 - `scripts/setup-host-munin-node.sh` は、接続元の Munin サーバー IP に加えて Docker bridge 用の `cidr_allow` も入れるので、PCごとに Docker サブネットが変わっても通しやすくしています

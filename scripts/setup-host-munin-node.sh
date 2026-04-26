@@ -11,8 +11,7 @@ DOCKER_CIDR="${2:-172.16.0.0/12}"
 PLUGIN_SOURCE="/usr/share/munin/plugins/docker_"
 
 sudo apt-get update
-sudo apt-get install -y munin-node python3-pip
-sudo python3 -m pip install docker
+sudo apt-get install -y munin-node python3-docker
 sudo usermod -aG docker munin
 
 sudo install -m 0755 "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/docker_" "${PLUGIN_SOURCE}"
