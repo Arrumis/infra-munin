@@ -34,13 +34,11 @@ sudo ln -sfn "${PLUGIN_SOURCE}" docker_size
 sudo ln -sfn "${PLUGIN_SOURCE}" docker_status
 sudo ln -sfn "${PLUGIN_SOURCE}" docker_volumes
 
-ESCAPED_IP="$(printf '%s' "${MUNIN_SERVER_IP}" | sed 's/\./\\./g')"
-if ! grep -q "^allow \^${ESCAPED_IP}\\\\$" /etc/munin/munin-node.conf; then
+if ! sudo grep -Fqx "allow ^${MUNIN_SERVER_IP}$" /etc/munin/munin-node.conf; then
   echo "allow ^${MUNIN_SERVER_IP}\$" | sudo tee -a /etc/munin/munin-node.conf >/dev/null
 fi
 
-ESCAPED_CIDR="$(printf '%s' "${DOCKER_CIDR}" | sed 's/\./\\./g; s/\//\\\\\\//g')"
-if ! grep -q "^cidr_allow ${ESCAPED_CIDR}$" /etc/munin/munin-node.conf; then
+if ! sudo grep -Fqx "cidr_allow ${DOCKER_CIDR}" /etc/munin/munin-node.conf; then
   echo "cidr_allow ${DOCKER_CIDR}" | sudo tee -a /etc/munin/munin-node.conf >/dev/null
 fi
 
