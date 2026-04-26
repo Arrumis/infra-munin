@@ -6,6 +6,16 @@ Munin の監視 UI を Docker 化した独立 repo です。旧 installer の `i
 
 GitHub のコミット一覧が英語で分かりにくい場合は、[コミット履歴の日本語メモ](docs/COMMIT_HISTORY_JA.md) を見てください。
 
+## サンプル値の置き換え
+
+`.env.example` は公開用の見本です。実際に使う値は `.env.local` に書きます。
+
+- `PROXY_NETWORK_NAME` は reverse proxy と同じ Docker network 名にします
+- `MUNIN_HTTP_PORT` は他サービスと衝突する場合だけ変更します
+- `MUNIN_NODE_NAME` は Munin 画面に出る名前なので、自分のホスト名に変えて構いません
+- `MUNIN_NODE_ADDRESS` は通常 `host.docker.internal` のままで構いません
+- 親 repo からまとめて使う場合は、`stack.service.env.local` の `GLOBAL__PROXY_NETWORK_NAME` や `INFRA_MUNIN__...` を使います
+
 ## 起動
 
 ```bash
