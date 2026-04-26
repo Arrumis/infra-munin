@@ -34,7 +34,9 @@ sudo ln -sfn "${PLUGIN_SOURCE}" docker_size
 sudo ln -sfn "${PLUGIN_SOURCE}" docker_status
 sudo ln -sfn "${PLUGIN_SOURCE}" docker_volumes
 
-if ! sudo grep -Fqx "allow ^${MUNIN_SERVER_IP}$" /etc/munin/munin-node.conf; then
+ESCAPED_IP="${MUNIN_SERVER_IP//./\\.}"
+if ! sudo grep -Fqx "allow ^${MUNIN_SERVER_IP}$" /etc/munin/munin-node.conf \
+  && ! sudo grep -Fqx "allow ^${ESCAPED_IP}$" /etc/munin/munin-node.conf; then
   echo "allow ^${MUNIN_SERVER_IP}\$" | sudo tee -a /etc/munin/munin-node.conf >/dev/null
 fi
 
