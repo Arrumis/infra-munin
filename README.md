@@ -1,22 +1,9 @@
 # infra-munin
 
-Munin の監視 UI を Docker 化した独立 repo です。旧 installer の `inst/munin` と `munin.sh` を分離し、環境依存の置換処理を `init-layout.sh` に集約しています。
+Munin の監視画面を Docker で動かすためのリポジトリです。
+Docker コンテナとホスト側の munin-node を監視します。
 
-## 日本語メモ
-
-GitHub のコミット一覧が英語で分かりにくい場合は、[コミット履歴の日本語メモ](docs/COMMIT_HISTORY_JA.md) を見てください。
-
-## サンプル値の置き換え
-
-`.env.example` は公開用の見本です。実際に使う値は `.env.local` に書きます。
-
-- `PROXY_NETWORK_NAME` は reverse proxy と同じ Docker network 名にします
-- `MUNIN_HTTP_PORT` は他サービスと衝突する場合だけ変更します
-- `MUNIN_NODE_NAME` は Munin 画面に出る名前なので、自分のホスト名に変えて構いません
-- `MUNIN_NODE_ADDRESS` は通常 `host.docker.internal` のままで構いません
-- 親 repo からまとめて使う場合は、`stack.service.env.local` の `GLOBAL__PROXY_NETWORK_NAME` や `INFRA_MUNIN__...` を使います
-
-## 起動
+## 使い方
 
 ```bash
 cp .env.example .env.local
@@ -25,41 +12,47 @@ docker compose --env-file .env.local up -d
 docker compose exec munin /setup_docker_plugins.sh
 ```
 
-初回は reverse proxy と同じ external network が必要です。
+初回はリバースプロキシと同じ Docker ネットワークが必要です。
 
 ```bash
 docker network create proxy-network
 ```
 
-`8080` が他サービスで使われている場合は、`.env.local` の `MUNIN_HTTP_PORT` を変えてから起動します。
+## 変更する値
+
+`.env.example` は公開用の見本です。実際の値は `.env.local` に書きます。
+
+- `PROXY_NETWORK_NAME`: リバースプロキシと同じ Docker ネットワーク名です。
+- `MUNIN_HTTP_PORT`: Munin 画面のローカル公開ポートです。
+- `MUNIN_NODE_NAME`: グラフ上に出る監視ノード名です。
+- `MUNIN_NODE_ADDRESS`: munin-node の接続先です。通常は既定値のままで構いません。
+- `INFRA_MUNIN__...`: 親リポジトリからまとめて設定するときに使います。
 
 ## 管理対象
 
-- Munin Web UI コンテナ
+- Munin 画面コンテナ
 - Docker 監視用 `docker_` プラグイン
+- ホスト側 munin-node の接続許可設定
 
-ホスト側の `munin-node` 設定はコンテナの外にあります。
-親 repo の一括インストールでは `scripts/setup-host-munin-node.sh` を自動実行します。
-手動で再設定したい場合も、同じスクリプトを使えます。
+ホスト側の munin-node はコンテナの外にあります。
+親リポジトリから一括導入する場合は `scripts/setup-host-munin-node.sh` が実行されます。
 
-## 初期化
+## データ
 
-```bash
-./scripts/init-layout.sh
-```
+GitHub に上げるもの:
 
-このスクリプトは以下を行います。
+- `compose.yaml`
+- `.env.example`
+- `scripts/`
+- `templates/`
+- `README.md`
 
-- `data/config/` を作成
-- `templates/config/` から実運用用設定を生成
-- `MUNIN_NODE_ADDRESS` などの環境変数を設定へ反映
+GitHub に上げないもの:
 
-Docker 上の Munin からホストの `munin-node` を参照する場合、既定では `host.docker.internal` を使います。Linux でも動くように `compose.yaml` で `host-gateway` を追加しています。
-Web UI は reverse proxy から `127.0.0.1:<MUNIN_HTTP_PORT>` で受ける想定なので、Apache 側でも loopback を許可しています。
+- `.env.local`
+- `data/config/`
 
 ## 補足
 
-- `apache2_munin.conf` は内部ネットワークからのアクセスだけ許可します
-- 認証は proxy 側で行う前提なので、Munin コンテナ内部の basic 認証は有効化していません
-- ホストに `munin-node` を入れる処理は `scripts/setup-host-munin-node.sh` で行います
-- `scripts/setup-host-munin-node.sh` は、接続元の Munin サーバー IP に加えて Docker bridge 用の `cidr_allow` も入れるので、PCごとに Docker サブネットが変わっても通しやすくしています
+- 認証はリバースプロキシ側で行う前提です。
+- Apache 側では、Docker 内部やホスト内からの接続だけを許可します。
