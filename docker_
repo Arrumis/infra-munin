@@ -97,7 +97,11 @@ except ImportError:
     # just use the property decorator, without caching
     # This is for backward compatibility with Python<3.8
     cached_property = property
-from multiprocessing import Process, Queue
+import multiprocessing as mp
+
+mp.set_start_method("fork", force=True)
+Process = mp.Process
+Queue = mp.Queue
 
 
 def sorted_by_creation_date(func):

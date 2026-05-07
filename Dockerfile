@@ -1,10 +1,14 @@
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Tokyo
 
 RUN apt-get update && \
     apt-get install -y munin apache2 cron munin-common tzdata munin-plugins-extra python3 python3-pip wget && \
     apt-get clean
+
+RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && \
+    echo ${TZ} > /etc/timezone
 
 RUN groupadd -r docker && usermod -aG docker munin
 
