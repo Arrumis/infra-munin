@@ -10,6 +10,31 @@ MUNIN_SERVER_IP="$1"
 DOCKER_CIDR="${2:-172.16.0.0/12}"
 PLUGIN_SOURCE="/usr/share/munin/plugins/docker_"
 
+cleanup_stale_network_plugins() {
+  local plugin_dir="/etc/munin/plugins"
+  local plugin base iface
+
+  for plugin in "${plugin_dir}"/if_* "${plugin_dir}"/if_err_*; do
+    [[ -L "${plugin}" ]] || continue
+
+    base="$(basename "${plugin}")"
+    if [[ "${base}" == if_err_* ]]; then
+      iface="${base#if_err_}"
+    else
+      iface="${base#if_}"
+    fi
+
+    case "${iface}" in
+      br-*|veth*) ;;
+      *) continue ;;
+    esac
+
+    if ! ip link show "${iface}" >/dev/null 2>&1; then
+      sudo rm -f "${plugin}"
+    fi
+  done
+}
+
 sudo apt-get update
 sudo apt-get install -y munin-node python3-docker
 sudo usermod -aG docker munin
@@ -33,6 +58,7 @@ sudo ln -sfn "${PLUGIN_SOURCE}" docker_network
 sudo ln -sfn "${PLUGIN_SOURCE}" docker_size
 sudo ln -sfn "${PLUGIN_SOURCE}" docker_status
 sudo ln -sfn "${PLUGIN_SOURCE}" docker_volumes
+cleanup_stale_network_plugins
 
 ESCAPED_IP="${MUNIN_SERVER_IP//./\\.}"
 if ! sudo grep -Fqx "allow ^${MUNIN_SERVER_IP}$" /etc/munin/munin-node.conf \
