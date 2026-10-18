@@ -6,7 +6,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
-      - "${MUNIN_HTTP_PORT:-8080}:80"
+      - "127.0.0.1:${MUNIN_HTTP_PORT:-8080}:80"
     volumes:
       - ./data/config/munin.conf:/etc/munin/munin.conf:ro
       - ./data/config/apache2_munin.conf:/etc/apache2/conf-enabled/munin.conf:ro
@@ -14,13 +14,44 @@ services:
       - ./data/config/apache2_apache2.conf:/etc/apache2/apache2.conf:ro
       - ./data/config/plugin-conf.d/docker:/etc/munin/plugin-conf.d/docker:ro
       - ./scripts/setup-docker-plugins.sh:/setup_docker_plugins.sh:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./data/munin-db:/var/lib/munin
+      - ./data/munin-cache:/var/cache/munin
+      - ./data/munin-log:/var/log/munin
+    depends_on:
+      socket-proxy:
+        condition: service_healthy
     environment:
       TZ: "${TZ:-Asia/Tokyo}"
     networks:
       proxy:
+      monitoring:
+
+  socket-proxy:
+    image: python:3.12-alpine
+    restart: unless-stopped
+    command: ["python", "-B", "/proxy.py"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:2375/_ping', timeout=2).read()"]
+      interval: 5s
+      timeout: 3s
+      retries: 6
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./socket-proxy/proxy.py:/proxy.py:ro
+    networks:
+      - monitoring
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 networks:
   proxy:
     external: true
     name: "${PROXY_NETWORK_NAME:-proxy-network}"
+
+  monitoring:
+    internal: true

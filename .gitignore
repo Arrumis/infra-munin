@@ -7,3 +7,10 @@ data/config/plugin-conf.d/*
 !data/config/.gitkeep
 !data/config/plugin-conf.d/.gitkeep
 !scripts/*.sh
+
+data/munin-db/
+data/munin-cache/
+data/munin-log/
+
+__pycache__/
+*.pyc
