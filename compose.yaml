@@ -6,7 +6,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
-      - "127.0.0.1:${MUNIN_HTTP_PORT:-8080}:80"
+      - "${MUNIN_HTTP_PORT:-8080}:80"
     volumes:
       - ./data/config/munin.conf:/etc/munin/munin.conf:ro
       - ./data/config/apache2_munin.conf:/etc/apache2/conf-enabled/munin.conf:ro
